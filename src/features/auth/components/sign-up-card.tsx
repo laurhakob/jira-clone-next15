@@ -15,6 +15,8 @@ import { SignInFlow } from "../types";
 import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import Image from "next/image";
+import { DottedSeparator } from "@/components/dotted-separator";
 
 interface SignUpCardProps {
   setState: (state: SignInFlow) => void;
@@ -58,6 +60,10 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
   return (
     <Card className="w-full h-full p-8">
       <CardHeader className="px-0 pt-0">
+        <Image src="/logo.svg" alt="logo" height={100} width={100} />
+        <div className="p-5">
+          <DottedSeparator />
+        </div>
         <CardTitle>Sign up to continue</CardTitle>
         <CardDescription>
           Use your email or another service to continue

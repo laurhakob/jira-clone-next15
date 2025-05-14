@@ -15,6 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { SignInFlow } from "../types";
 import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
+import Image from "next/image";
+import { DottedSeparator } from "@/components/dotted-separator";
 
 interface SignInCardProps {
   setState: (state: SignInFlow) => void;
@@ -50,6 +52,10 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
 
   return (
     <Card className="w-full h-full p-8">
+      <Image src="/logo.svg" alt="logo" height={100} width={100} />
+      <div className="p-5">
+        <DottedSeparator />
+      </div>
       <CardHeader className="px-0 pt-0">
         <CardTitle>Login to continue</CardTitle>
         <CardDescription>
@@ -122,5 +128,4 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
     </Card>
   );
 };
-
 
