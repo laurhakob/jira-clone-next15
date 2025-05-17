@@ -25,7 +25,9 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <ConvexClientProvider>
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>
+             
+              {children}</QueryProvider>
           </ConvexClientProvider>
         </body>
       </html>

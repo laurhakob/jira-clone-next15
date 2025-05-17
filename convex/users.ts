@@ -12,3 +12,5 @@ export const current = query({
     return await ctx.db.get(userId);
   },
 });
+
+
