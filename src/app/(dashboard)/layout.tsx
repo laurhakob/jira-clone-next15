@@ -9,7 +9,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen ">
       <div className="flex w-full h-full">
-        <div className="flexed left-0 top-0 hidden lg:block lg:w-[264px] h-full overflow-y-auto">
+        <div className="left-0 top-0 lg:flex hidden lg:w-[264px] h-full overflow-y-auto">
           <Sidebar />
         </div>
         {/* stex grac er className="lg:pl-[264px] w-full */}

@@ -8,6 +8,7 @@ export default defineSchema({
     name: v.string(),
     image: v.optional(v.id("_storage")), // Convex file reference
     userId: v.id("users"),
-    // joinCode: v.string(),
   }),
 });
+
+
