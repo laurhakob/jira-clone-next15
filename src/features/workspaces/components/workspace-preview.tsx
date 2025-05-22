@@ -1078,7 +1078,7 @@
 
 
 
-// porcum enq GROKi versiayov hima, ashxatoxy naxordn er 
+// lav ashxatum a GROK-ov 
 
 "use client";
 import { useState } from "react";

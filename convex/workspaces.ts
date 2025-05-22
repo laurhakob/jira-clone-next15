@@ -218,3 +218,22 @@ export const remove = mutation({
   },
 });
 
+
+
+// esi grokov avelacac 
+
+
+export const getById = query({
+  args: { id: v.id("workspaces") },
+  handler: async (ctx, args) => {
+    const workspace = await ctx.db.get(args.id);
+    if (!workspace) return null;
+
+    let imageUrl = null;
+    if (workspace.image) {
+      imageUrl = await ctx.storage.getUrl(workspace.image);
+    }
+    return { ...workspace, imageUrl };
+  },
+});
+
