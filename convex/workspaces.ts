@@ -1,5 +1,3 @@
-
-
 // import { mutation, query } from "./_generated/server";
 // import { v } from "convex/values";
 // import { getAuthUserId } from "@convex-dev/auth/server";
@@ -38,7 +36,6 @@
 //   },
 // });
 
-
 // export const remove = mutation({
 //   args: { id: v.id("workspaces") },
 //   handler: async (ctx, { id }) => {
@@ -53,8 +50,6 @@
 //     await ctx.db.delete(id);
 //   },
 // });
-
-
 
 // es minchev GROKy ashxatoxn er
 
@@ -127,14 +122,7 @@
 //   },
 // });
 
-
-
-
-
-
-
-// porcum enq GROKi versiayov hima, ashxatoxy naxordn er 
-
+// porcum enq GROKi versiayov hima, ashxatoxy naxordn er
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -150,7 +138,6 @@ export const get = query({
       .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
-    // Fetch image URLs for each workspace
     const workspacesWithUrls = await Promise.all(
       workspaces.map(async (ws) => {
         let imageUrl = null;
@@ -165,9 +152,6 @@ export const get = query({
   },
 });
 
-/* Rest of the file (create, update, remove) remains unchanged */
-
-/* ─────────────────────  CREATE  ──────────────────── */
 export const create = mutation({
   args: {
     name: v.string(),
@@ -177,15 +161,22 @@ export const create = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Unauthorized");
 
-    return ctx.db.insert("workspaces", {
+    const workspaceId = await ctx.db.insert("workspaces", {
       name: args.name,
       image: args.image,
       userId,
     });
+
+    await ctx.db.insert("members", {
+      workspaceId,
+      userId,
+      isCreator: true,
+    });
+
+    return workspaceId;
   },
 });
 
-/* ─────────────────────  UPDATE  ──────────────────── */
 export const update = mutation({
   args: {
     id: v.id("workspaces"),
@@ -203,7 +194,6 @@ export const update = mutation({
   },
 });
 
-/* ─────────────────────  DELETE  ──────────────────── */
 export const remove = mutation({
   args: { id: v.id("workspaces") },
   handler: async (ctx, { id }) => {
@@ -218,16 +208,27 @@ export const remove = mutation({
   },
 });
 
-
-
-// esi grokov avelacac 
-
-
 export const getById = query({
   args: { id: v.id("workspaces") },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Unauthorized");
+
     const workspace = await ctx.db.get(args.id);
     if (!workspace) return null;
+
+    const isCreator = workspace.userId === userId;
+    const isMember = await ctx.db
+      .query("members")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("workspaceId"), args.id),
+          q.eq(q.field("userId"), userId)
+        )
+      )
+      .first();
+
+    if (!isCreator && !isMember) return null;
 
     let imageUrl = null;
     if (workspace.image) {
@@ -237,3 +238,21 @@ export const getById = query({
   },
 });
 
+export const getMembers = query({
+  args: { workspaceId: v.id("workspaces") },
+  handler: async (ctx, args) => {
+    const members = await ctx.db
+      .query("members")
+      .filter((q) => q.eq(q.field("workspaceId"), args.workspaceId))
+      .collect();
+
+    const membersWithUserDetails = await Promise.all(
+      members.map(async (member) => {
+        const user = await ctx.db.get(member.userId);
+        return { ...member, user };
+      })
+    );
+
+    return membersWithUserDetails;
+  },
+});

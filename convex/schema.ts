@@ -6,9 +6,12 @@ export default defineSchema({
   ...authTables,
   workspaces: defineTable({
     name: v.string(),
-    image: v.optional(v.id("_storage")), // Convex file reference
+    image: v.optional(v.id("_storage")),
     userId: v.id("users"),
   }),
+  members: defineTable({
+    workspaceId: v.id("workspaces"),
+    userId: v.id("users"),
+    isCreator: v.boolean(),
+  }).index("by_workspace", ["workspaceId"]),
 });
-
-
