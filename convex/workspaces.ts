@@ -122,10 +122,12 @@
 //   },
 // });
 
-// porcum enq GROKi versiayov hima, ashxatoxy naxordn er
+// porcum enq GROKi versiayov hima
+
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { Id } from "./_generated/dataModel";
 
 export const get = query({
   args: {},
@@ -177,22 +179,33 @@ export const create = mutation({
   },
 });
 
+
 export const update = mutation({
   args: {
     id: v.id("workspaces"),
-    name: v.string(),
+    name: v.optional(v.string()),
+    image: v.optional(v.id("_storage")),
+    removeImage: v.optional(v.boolean()),
   },
-  handler: async (ctx, { id, name }) => {
+  handler: async (ctx, { id, name, image, removeImage }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Unauthorized");
 
     const ws = await ctx.db.get(id);
     if (!ws || ws.userId !== userId) throw new Error("Forbidden");
 
-    await ctx.db.patch(id, { name });
+    const updates: { name?: string; image?: Id<"_storage"> | undefined } = {};
+    if (name !== undefined) updates.name = name;
+    if (removeImage) {
+      updates.image = undefined;
+    } else if (image !== undefined) {
+      updates.image = image;
+    }
+    await ctx.db.patch(id, updates);
     return id;
   },
 });
+
 
 export const remove = mutation({
   args: { id: v.id("workspaces") },

@@ -1,40 +1,9 @@
-// "use client";
-
-// import { useMutation } from "convex/react";
-// import { api } from "../../../convex/_generated/api";
-
-// export default function FileUpload() {
-//   const generateUploadUrl = useMutation(api.upload.generateUploadUrl);
-
-//   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-
-//     const uploadUrl = await generateUploadUrl();
-
-//     const result = await fetch(uploadUrl, {
-//       method: "POST",
-//       body: file,
-//       headers: {
-//         "Content-Type": file.type,
-//       },
-//     });
-
-//     const { storageId } = await result.json();
-//     console.log("File uploaded! Storage ID:", storageId);
-//   };
-
-//   return (
-//     <div>
-//       <input type="file" onChange={handleFileChange} />
-//     </div>
-//   );
-// }
-
 // es verjnakann er
 // avelacnum enq image uploady
 
 // src/features/upload/FileUpload.tsx
+
+
 
 "use client";
 
@@ -74,6 +43,47 @@ export default function FileUpload({ onUploadComplete }: FileUploadProps) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+// "use client";
+
+// import { useMutation } from "convex/react";
+// import { api } from "../../../convex/_generated/api";
+
+// export default function FileUpload() {
+//   const generateUploadUrl = useMutation(api.upload.generateUploadUrl);
+
+//   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (!file) return;
+
+//     const uploadUrl = await generateUploadUrl();
+
+//     const result = await fetch(uploadUrl, {
+//       method: "POST",
+//       body: file,
+//       headers: {
+//         "Content-Type": file.type,
+//       },
+//     });
+
+//     const { storageId } = await result.json();
+//     console.log("File uploaded! Storage ID:", storageId);
+//   };
+
+//   return (
+//     <div>
+//       <input type="file" onChange={handleFileChange} />
+//     </div>
+//   );
+// }
+
 
 
 
