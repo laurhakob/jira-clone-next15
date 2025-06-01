@@ -246,7 +246,7 @@
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
-import { useCurrentUser } from "@/features/auth/api/use-current-user"; // Adjust path
+import { useCurrentUser } from "@/features/auth/api/use-current-user";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import Image from "next/image";
@@ -280,6 +280,9 @@ export default function Home() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editName, setEditName] = useState(workspace?.name || "");
   const [confirmDeleteId, setConfirmDeleteId] = useState<Id<"workspaces"> | null>(null);
+
+  // Check if the current user is the creator of the workspace
+  const isCreator = user && workspace && user._id === workspace.userId;
 
   const handleEdit = () => {
     if (workspace) {
@@ -325,20 +328,23 @@ export default function Home() {
               className="rounded mt-2"
             />
           )}
-          <div className="mt-2 space-x-2">
-            <Button
-              className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
-              onClick={handleEdit}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => setConfirmDeleteId(workspace._id)}
-            >
-              Delete
-            </Button>
-          </div>
+          {/* Only show Edit and Delete buttons if the user is the creator */}
+          {isCreator && (
+            <div className="mt-2 space-x-2">
+              <Button
+                className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
+                onClick={handleEdit}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setConfirmDeleteId(workspace._id)}
+              >
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
