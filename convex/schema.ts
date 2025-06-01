@@ -15,3 +15,6 @@ export default defineSchema({
     isCreator: v.boolean(),
   }).index("by_workspace", ["workspaceId"]),
 });
+
+
+

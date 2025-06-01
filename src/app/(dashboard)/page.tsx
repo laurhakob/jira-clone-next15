@@ -106,11 +106,147 @@
 
 // shat lavn a GROK -ov 
 
+// "use client";
+
+// import { useState } from "react";
+// import { useSearchParams, useRouter } from "next/navigation";
+// import { useQuery } from "convex/react";
+// import { api } from "../../../convex/_generated/api";
+// import { Id } from "../../../convex/_generated/dataModel";
+// import Image from "next/image";
+// import { useDeleteWorkspace } from "@/features/workspaces/api/use-delete-workspace";
+// import { useUpdateWorkspace } from "@/features/workspaces/api/use-update-workspace";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogTitle,
+//   DialogDescription,
+// } from "@/components/ui/dialog";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+
+// export default function Home() {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
+//   const workspaceIdStr = searchParams.get("workspaceId");
+//   const workspaceId = workspaceIdStr ? (workspaceIdStr as Id<"workspaces">) : null;
+
+//   const workspace = useQuery(
+//     api.workspaces.getById,
+//     workspaceId ? { id: workspaceId } : "skip"
+//   );
+
+//   const deleteWorkspace = useDeleteWorkspace();
+//   const updateWorkspace = useUpdateWorkspace();
+
+//   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+//   const [editName, setEditName] = useState(workspace?.name || "");
+//   const [confirmDeleteId, setConfirmDeleteId] = useState<Id<"workspaces"> | null>(null);
+
+//   const handleEdit = () => {
+//     if (workspace) {
+//       setEditName(workspace.name);
+//       setIsEditModalOpen(true);
+//     }
+//   };
+
+//   const handleEditSave = async () => {
+//     if (!workspaceId || editName.trim().length < 3) return;
+//     await updateWorkspace({ id: workspaceId, name: editName });
+//     setIsEditModalOpen(false);
+//   };
+
+//   const handleDelete = async () => {
+//     if (!workspaceId) return;
+//     await deleteWorkspace({ id: workspaceId });
+//     setConfirmDeleteId(null);
+//     router.push("/"); // Redirect to home without workspaceId
+//   };
+
+//   return (
+//     <div className="p-4">
+//       <div>This is a home page</div>
+//       {workspace && (
+//         <div className="mt-4">
+//           <h2 className="text-lg font-semibold">{workspace.name}</h2>
+//           <p className="text-sm text-gray-500">ID: {workspace._id}</p>
+//           {workspace.imageUrl && (
+//             <Image
+//               src={workspace.imageUrl}
+//               alt={workspace.name}
+//               width={200}
+//               height={200}
+//               className="rounded mt-2"
+//             />
+//           )}
+//           <div className="mt-2 space-x-2">
+//             <Button
+//               className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
+//               onClick={handleEdit}
+//             >
+//               Edit
+//             </Button>
+//             <Button
+//               variant="destructive"
+//               onClick={() => setConfirmDeleteId(workspace._id)}
+//             >
+//               Delete
+//             </Button>
+//           </div>
+//         </div>
+//       )}
+
+//       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+//         <DialogContent>
+//           <DialogTitle>Edit Workspace</DialogTitle>
+//           <DialogDescription>Update the workspace name.</DialogDescription>
+//           <Input
+//             value={editName}
+//             onChange={(e) => setEditName(e.target.value)}
+//             placeholder="Workspace name"
+//             minLength={3}
+//           />
+//           <Button
+//             className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
+//             onClick={handleEditSave}
+//           >
+//             Save
+//           </Button>
+//         </DialogContent>
+//       </Dialog>
+
+//       <Dialog open={!!confirmDeleteId} onOpenChange={() => setConfirmDeleteId(null)}>
+//         <DialogContent>
+//           <DialogTitle>Delete this workspace?</DialogTitle>
+//           <DialogDescription className="mb-6 text-sm text-gray-600">
+//             This action cannot be undone.
+//           </DialogDescription>
+//           <div className="flex justify-end space-x-2">
+//             <Button variant="secondary" onClick={() => setConfirmDeleteId(null)}>
+//               Cancel
+//             </Button>
+//             <Button variant="destructive" onClick={handleDelete}>
+//               Delete
+//             </Button>
+//           </div>
+//         </DialogContent>
+//       </Dialog>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+// ireakany naxordn a, esi update versia a log outi hamar 
 "use client";
 
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
+import { useCurrentUser } from "@/features/auth/api/use-current-user"; // Adjust path
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import Image from "next/image";
@@ -126,6 +262,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
+  const { data: user, isLoading } = useCurrentUser();
+  const isAuthenticated = !!user;
   const router = useRouter();
   const searchParams = useSearchParams();
   const workspaceIdStr = searchParams.get("workspaceId");
@@ -133,7 +271,7 @@ export default function Home() {
 
   const workspace = useQuery(
     api.workspaces.getById,
-    workspaceId ? { id: workspaceId } : "skip"
+    isAuthenticated && workspaceId ? { id: workspaceId } : "skip"
   );
 
   const deleteWorkspace = useDeleteWorkspace();
@@ -162,6 +300,14 @@ export default function Home() {
     setConfirmDeleteId(null);
     router.push("/"); // Redirect to home without workspaceId
   };
+
+  if (isLoading) {
+    return <div className="p-4 text-center">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <p className="p-4 text-center">Please log in to access this page.</p>;
+  }
 
   return (
     <div className="p-4">
