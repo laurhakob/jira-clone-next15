@@ -38,11 +38,11 @@ export const Navigation = () => {
       activeIcon: SettingsIcon,
     },
     {
-      label: "Members",
-      href: "/members",
-      icon: UsersIcon,
-      activeIcon: UsersIcon,
-    },
+  label: "Members",
+  href: workspaceId ? `/members?workspaceId=${workspaceId}` : "/members",
+  icon: UsersIcon,
+  activeIcon: UsersIcon,
+}
   ];
 
   return (
