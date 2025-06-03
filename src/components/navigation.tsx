@@ -1,8 +1,6 @@
-
-// update a arel groky settings i hamar
-
 "use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SettingsIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
@@ -12,43 +10,47 @@ import {
   GoHome,
   GoHomeFill,
 } from "react-icons/go";
-import { useSearchParams } from "next/navigation";
 
 export const Navigation = () => {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const workspaceId = searchParams.get("workspaceId");
 
   const routes = [
     {
       label: "Home",
+      path: "/",
       href: workspaceId ? `/?workspaceId=${workspaceId}` : "/",
       icon: GoHome,
       activeIcon: GoHomeFill,
     },
     {
       label: "My Tasks",
+      path: "/tasks",
       href: "/tasks",
       icon: GoCheckCircle,
       activeIcon: GoCheckCircleFill,
     },
     {
       label: "Settings",
+      path: "/settings",
       href: workspaceId ? `/settings?workspaceId=${workspaceId}` : "/settings",
       icon: SettingsIcon,
       activeIcon: SettingsIcon,
     },
     {
-  label: "Members",
-  href: workspaceId ? `/members?workspaceId=${workspaceId}` : "/members",
-  icon: UsersIcon,
-  activeIcon: UsersIcon,
-}
+      label: "Members",
+      path: "/members",
+      href: workspaceId ? `/members?workspaceId=${workspaceId}` : "/members",
+      icon: UsersIcon,
+      activeIcon: UsersIcon,
+    },
   ];
 
   return (
     <ul className="flex flex-col">
       {routes.map((item) => {
-        const isActive = false; // You can enhance this with usePathname if needed
+        const isActive = pathname === item.path;
         const Icon = isActive ? item.activeIcon : item.icon;
 
         return (
@@ -56,8 +58,9 @@ export const Navigation = () => {
             <div
               className={cn(
                 "flex items-center gap-2.5 p-2.5 rounded-md font-medium hover:text-primary transition text-neutral-500",
-                isActive && "bg-white shadow-sm hover:opacity-100 text-primary"
+                isActive && "bg-white shadow-sm text-primary"
               )}
+              aria-current={isActive ? "page" : undefined}
             >
               <Icon className="size-5 text-neutral-500" />
               {item.label}
