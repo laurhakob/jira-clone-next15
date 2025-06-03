@@ -281,8 +281,8 @@ export default function Home() {
   const [editName, setEditName] = useState(workspace?.name || "");
   const [confirmDeleteId, setConfirmDeleteId] = useState<Id<"workspaces"> | null>(null);
 
-  // Check if the current user is the creator of the workspace
-  const isCreator = user && workspace && user._id === workspace.userId;
+  // Use isAdmin from the workspace query instead of checking user._id === workspace.userId
+  const isAdmin = workspace?.isAdmin;
 
   const handleEdit = () => {
     if (workspace) {
@@ -328,8 +328,7 @@ export default function Home() {
               className="rounded mt-2"
             />
           )}
-          {/* Only show Edit and Delete buttons if the user is the creator */}
-          {isCreator && (
+          {isAdmin && (
             <div className="mt-2 space-x-2">
               <Button
                 className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
