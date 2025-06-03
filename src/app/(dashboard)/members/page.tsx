@@ -63,7 +63,18 @@ export default function MembersPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{member.user?.name || "Unknown"}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{member.user?.name || "Unknown"}</p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        member.isCreator
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {member.isCreator ? "Admin" : "Member"}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-500">
                     {member.user?.email || "No email"}
                   </p>
