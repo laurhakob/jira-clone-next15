@@ -1,11 +1,7 @@
-// shat lavn a GROK-ov
-
 "use client";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
-import { useCreateWorkspace } from "@/features/workspaces/api/use-create-workspace";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { RiAddCircleFill } from "react-icons/ri";
@@ -26,14 +22,21 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import FileUpload from "@/features/upload/fileUpload";
+import { useCreateProject } from "@/features/projects/api/use-create-project";
 import { Id } from "../../convex/_generated/dataModel";
 
-export const WorkspaceSwitcher = () => {
+export const ProjectSwitcher = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const workspaceId = searchParams.get("workspaceId");
-  const { data: workspaces, isLoading } = useGetWorkspaces();
-  const createWorkspace = useCreateWorkspace();
+  const workspaceId = searchParams.get("workspaceId") as Id<"workspaces"> | null;
+  const projectId = searchParams.get("projectId") as Id<"projects"> | null;
+
+  const projects = useQuery(
+    api.projects.get,
+    workspaceId ? { workspaceId } : "skip"
+  );
+
+  const createProject = useCreateProject();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState("");
@@ -45,67 +48,61 @@ export const WorkspaceSwitcher = () => {
   );
 
   const handleCreate = async () => {
-    if (name.trim().length < 3) return;
-    const newWorkspaceId = await createWorkspace({
+    if (!workspaceId || name.trim().length < 3) return;
+    const newProjectId = await createProject({
+      workspaceId,
       name,
       image: imageId ?? undefined,
     });
     setName("");
     setImageId(null);
     setIsModalOpen(false);
-    router.push(`/?workspaceId=${newWorkspaceId}`);
+    router.push(`/?workspaceId=${workspaceId}&projectId=${newProjectId}`);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-xs uppercase text-neutral-500">Workspaces</p>
-          <RiAddCircleFill
-            className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
-            onClick={() => setIsModalOpen(true)}
-          />
-        </div>
-        <p>Loading workspaces...</p>
-      </div>
-    );
+  if (!workspaceId) {
+    return null; // Don't show if no workspace is selected
+  }
+
+  if (projects === undefined) {
+    return <p>Loading projects...</p>;
   }
 
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase text-neutral-500">Workspaces</p>
+        <p className="text-xs uppercase text-neutral-500">Projects</p>
         <RiAddCircleFill
           className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
           onClick={() => setIsModalOpen(true)}
         />
       </div>
       <Select
-        value={workspaceId || undefined}
-        onValueChange={(value) => router.push(`/?workspaceId=${value}`)}
+        value={projectId || undefined}
+        onValueChange={(value) =>
+          router.push(`/?workspaceId=${workspaceId}&projectId=${value}`)
+        }
       >
         <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
-          <SelectValue placeholder="No workspace selected" />
+          <SelectValue placeholder="No project selected" />
         </SelectTrigger>
         <SelectContent>
-          {workspaces?.length === 0 ? (
-            <p className="text-sm text-neutral-500 p-2">
-              No workspaces available
-            </p>
+          {projects.length === 0 ? (
+            <p className="text-sm text-neutral-500 p-2">No projects available</p>
           ) : (
-            workspaces?.map((workspace) => (
-              <SelectItem key={workspace._id} value={workspace._id}>
+            projects.map((project) => (
+              <SelectItem key={project._id} value={project._id}>
                 <div className="flex items-center gap-2">
-                  {workspace.imageUrl && (
+                  {project.imageUrl && (
                     <Image
-                      src={workspace.imageUrl}
-                      alt={workspace.name}
+                      src={project.imageUrl}
+                      alt={project.name}
                       width={24}
                       height={24}
                       className="rounded"
                     />
                   )}
-                  <span className="truncate">{workspace.name}</span>
+                  <span className="truncate">{project.name}</span>
                 </div>
               </SelectItem>
             ))
@@ -115,14 +112,14 @@ export const WorkspaceSwitcher = () => {
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
-          <DialogTitle>Create a Workspace</DialogTitle>
+          <DialogTitle>Create a Project</DialogTitle>
           <DialogDescription>
-            Enter a name and optionally upload an image for your workspace.
+            Enter a name and optionally upload an image for your project.
           </DialogDescription>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Workspace name"
+            placeholder="Project name"
             minLength={3}
             required
           />
