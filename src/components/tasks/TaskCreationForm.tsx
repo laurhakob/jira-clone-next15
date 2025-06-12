@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,11 +16,10 @@ import Image from "next/image";
 interface TaskCreationFormProps {
   workspaceId: Id<"workspaces">;
   projectId?: Id<"projects">;
-  onClose?: () => void; // Made optional with '?'
+  onClose?: () => void;
 }
 
 export default function TaskCreationForm({ workspaceId, projectId, onClose }: TaskCreationFormProps) {
-  const router = useRouter();
   const members = useQuery(api.workspaces.getMembers, { workspaceId });
   const projects = useQuery(api.projects.get, { workspaceId });
   const createTask = useMutation(api.tasks.create);
@@ -36,7 +34,7 @@ export default function TaskCreationForm({ workspaceId, projectId, onClose }: Ta
 
   const handleCreate = async () => {
     if (!name || !selectedProject || !status) {
-      alert("Please fill in all required fields");
+      alert("Please fill in all required fields: Task Name, Project, and Status");
       return;
     }
 
@@ -50,9 +48,7 @@ export default function TaskCreationForm({ workspaceId, projectId, onClose }: Ta
     });
 
     if (onClose) {
-      onClose(); // Call onClose if provided (e.g., to close a modal)
-    } else {
-      router.back(); // Navigate back if no onClose (e.g., on a separate page)
+      onClose();
     }
   };
 
@@ -66,7 +62,7 @@ export default function TaskCreationForm({ workspaceId, projectId, onClose }: Ta
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Task Name</label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter task name" />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter task name" required />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Due Date</label>
@@ -154,7 +150,7 @@ export default function TaskCreationForm({ workspaceId, projectId, onClose }: Ta
       </div>
       <DottedSeparator className="my-4" />
       <div className="flex justify-end gap-2">
-        <Button variant="secondary" onClick={() => onClose ? onClose() : router.back()}>Cancel</Button>
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
         <Button onClick={handleCreate}>Create Task</Button>
       </div>
     </div>
