@@ -728,6 +728,17 @@ export default function Home() {
     return true;
   });
 
+  const getStatusClass = (status: string) => {
+    const styles: Record<string, string> = {
+      "Todo": "border-transparent bg-red-400 text-primary hover:bg-red-400/80 rounded-full",
+      "In Progress": "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80 rounded-full",
+      "In Review": "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80 rounded-full",
+      "Done": "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80 rounded-full",
+      "Backlog": "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80 rounded-full",
+    };
+    return styles[status] || "border-transparent bg-gray-400 text-primary hover:bg-gray-400/80 rounded-full";
+  };
+
   if (!workspaceId) {
     return (
       <div className="p-4">
@@ -1025,7 +1036,11 @@ export default function Home() {
                             ? format(new Date(task.dueDate), "MMM d, yyyy")
                             : "No due date"}
                         </td>
-                        <td className="p-2">{task.status}</td>
+                        <td className="p-2">
+                          <span className={`px-2 py-1 rounded inline-block ${getStatusClass(task.status)}`}>
+                            {task.status}
+                          </span>
+                        </td>
                         <td className="p-2">
                           <MoreVerticalIcon className="h-4 w-4" />
                         </td>
