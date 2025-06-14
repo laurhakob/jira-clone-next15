@@ -8,3 +8,4 @@ export interface Workspace {
   userId: Id<"users">;
   imageUrl: string | null;
 }
+

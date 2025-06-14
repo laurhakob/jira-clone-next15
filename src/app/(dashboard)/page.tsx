@@ -1,35 +1,584 @@
+// // "use client";
+
+// // import { useState } from "react";
+// // import { useSearchParams, useRouter } from "next/navigation";
+// // import { useQuery, useMutation } from "convex/react";
+// // import { api } from "../../../convex/_generated/api";
+// // import { Id } from "../../../convex/_generated/dataModel";
+// // import Image from "next/image";
+// // import { format } from "date-fns";
+// // import {
+// //   MoreVertical,
+// //   PlusIcon,
+// //   List,
+// //   User,
+// //   File,
+// //   Calendar,
+// //   ExternalLink,
+// //   Pencil,
+// //   Trash,
+// // } from "lucide-react";
+// // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// // import { Button } from "@/components/ui/button";
+// // import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// // import { DottedSeparator } from "@/components/dotted-separator";
+// // import TaskCreationForm from "@/components/tasks/TaskCreationForm";
+// // import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+// // import Link from "next/link";
+// // import {
+// //   DropdownMenu,
+// //   DropdownMenuContent,
+// //   DropdownMenuItem,
+// //   DropdownMenuTrigger,
+// // } from "@/components/ui/dropdown-menu";
+// // import {
+// //   Popover,
+// //   PopoverContent,
+// //   PopoverTrigger,
+// // } from "@/components/ui/popover";
+// // import DatePicker from "react-datepicker";
+// // import "react-datepicker/dist/react-datepicker.css";
+// // import { toast } from "sonner";
+
+// // export default function Home() {
+// //   const searchParams = useSearchParams();
+// //   const router = useRouter();
+// //   const workspaceIdStr = searchParams.get("workspaceId");
+// //   const workspaceId = workspaceIdStr
+// //     ? (workspaceIdStr as Id<"workspaces">)
+// //     : null;
+// //   const projectId = searchParams.get("projectId") as Id<"projects"> | null;
+
+// //   const workspace = useQuery(
+// //     api.workspaces.getById,
+// //     workspaceId ? { id: workspaceId } : "skip"
+// //   );
+// //   const project = useQuery(
+// //     api.projects.getById,
+// //     projectId ? { id: projectId } : "skip"
+// //   );
+// //   const tasks = useQuery(
+// //     projectId ? api.tasks.getByProject : api.tasks.getByWorkspace,
+// //     projectId ? { projectId } : workspaceId ? { workspaceId } : "skip"
+// //   );
+// //   const members = useQuery(
+// //     api.workspaces.getMembers,
+// //     workspaceId ? { workspaceId } : "skip"
+// //   );
+// //   const projects = useQuery(
+// //     api.projects.get,
+// //     workspaceId ? { workspaceId } : "skip"
+// //   );
+
+// //   const [selectedTasks, setSelectedTasks] = useState<Id<"tasks">[]>([]);
+// //   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+// //   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+// //   const [selectedAssignee, setSelectedAssignee] =
+// //     useState<Id<"members"> | null>(null);
+// //   const [selectedDueDate, setSelectedDueDate] = useState<Date | null>(null);
+// //   const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState<Id<"tasks"> | null>(null);
+
+// //   const deleteTask = useMutation(api.tasks.remove);
+
+// //   const statusOptions = ["Backlog", "In Progress", "In Review", "Todo", "Done"];
+
+// //   const handleSelectAll = () => {
+// //     if (tasks && selectedTasks.length === tasks.length) {
+// //       setSelectedTasks([]);
+// //     } else if (tasks) {
+// //       setSelectedTasks(tasks.map((task) => task._id));
+// //     }
+// //   };
+
+// //   const handleSelectTask = (taskId: Id<"tasks">) => {
+// //     setSelectedTasks((prev) =>
+// //       prev.includes(taskId)
+// //         ? prev.filter((id) => id !== taskId)
+// //         : [...prev, taskId]
+// //     );
+// //   };
+
+// //   const handleDeleteTask = async () => {
+// //     if (!confirmDeleteTaskId) return;
+// //     try {
+// //       await deleteTask({ id: confirmDeleteTaskId });
+// //       toast.success("Task deleted successfully");
+// //     } catch {
+// //       toast.error("Failed to delete task");
+// //     } finally {
+// //       setConfirmDeleteTaskId(null);
+// //     }
+// //   };
+
+// //   const filteredTasks = tasks?.filter((task) => {
+// //     if (selectedStatus && task.status !== selectedStatus) return false;
+// //     if (selectedAssignee && task.assigneeId !== selectedAssignee) return false;
+// //     if (
+// //       selectedDueDate &&
+// //       (!task.dueDate ||
+// //         new Date(task.dueDate).toDateString() !==
+// //           selectedDueDate.toDateString())
+// //     )
+// //       return false;
+// //     return true;
+// //   });
+
+// //   const getStatusClass = (status: string) => {
+// //     const styles: Record<string, string> = {
+// //       Todo: "border-transparent bg-red-400 text-primary hover:bg-red-400/80 rounded-full",
+// //       "In Progress":
+// //         "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80 rounded-full",
+// //       "In Review":
+// //         "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80 rounded-full",
+// //       Done: "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80 rounded-full",
+// //       Backlog:
+// //         "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80 rounded-full",
+// //     };
+// //     return (
+// //       styles[status] ||
+// //       "border-transparent bg-gray-400 text-primary hover:bg-gray-400/80 rounded-full"
+// //     );
+// //   };
+
+// //   if (!workspaceId) {
+// //     return (
+// //       <div className="p-4">
+// //         <p>No workspace selected. Please choose from the sidebar.</p>
+// //       </div>
+// //     );
+// //   }
+
+// //   if (workspace === undefined) {
+// //     return (
+// //       <div className="p-4">
+// //         <p>Loading workspace...</p>
+// //       </div>
+// //     );
+// //   }
+
+// //   if (workspace === null) {
+// //     return (
+// //       <div className="p-4">
+// //         <p>Workspace not found or you do not have access.</p>
+// //       </div>
+// //     );
+// //   }
+
+// //   return (
+// //     <div className="p-4">
+// //       {/* Path Display */}
+// //       <div className="mb-4 text-sm">
+// //         <span className="italic text-gray-500">Workspace: </span>
+// //         <Link
+// //           href={`/?workspaceId=${workspaceId}`}
+// //           className="text-blue-500 hover:underline"
+// //         >
+// //           {workspace.name}
+// //         </Link>
+// //         {projectId && project && (
+// //           <>
+// //             <span> / </span>
+// //             <span className="italic text-gray-500">Project: </span>
+// //             <span>{project.name}</span>
+// //           </>
+// //         )}
+// //       </div>
+
+// //       {/* Project Details */}
+// //       {projectId && project ? (
+// //         <div className="flex items-center gap-4">
+// //           {project.imageUrl && (
+// //             <Image
+// //               src={project.imageUrl}
+// //               alt={project.name}
+// //               width={32}
+// //               height={32}
+// //               className="rounded"
+// //             />
+// //           )}
+// //           <h2 className="text-lg font-semibold">{project.name}</h2>
+// //         </div>
+// //       ) : (
+// //         <h2 className="text-lg font-semibold">
+// //           All projects in {workspace.name}
+// //         </h2>
+// //       )}
+// //       {projectId && project && (
+// //         <p className="text-xs text-gray-400 mt-4">ID: {project._id}</p>
+// //       )}
+
+// //       {/* Tabs */}
+// //       <Tabs
+// //         defaultValue="table"
+// //         className="flex-1 w-full border rounded-lg mt-4"
+// //       >
+// //         <div className="h-full flex flex-col overflow-auto p-4">
+// //           <div className="flex flex-col gap-y-2 lg:flex-row justify-between items-center">
+// //             <TabsList className="w-full lg:w-auto">
+// //               <TabsTrigger className="h-8 w-full lg:w-auto" value="table">
+// //                 Table
+// //               </TabsTrigger>
+// //               <TabsTrigger className="h-8 w-full lg:w-auto" value="kanban">
+// //                 Kanban
+// //               </TabsTrigger>
+// //               <TabsTrigger className="h-8 w-full lg:w-auto" value="calendar">
+// //                 Calendar
+// //               </TabsTrigger>
+// //             </TabsList>
+// //             <Button
+// //               onClick={() => setIsTaskModalOpen(true)}
+// //               className="w-full lg:w-auto ml-4"
+// //             >
+// //               <PlusIcon className="mr-2 h-4 w-4" /> New
+// //             </Button>
+// //           </div>
+// //           <DottedSeparator className="my-4" />
+
+// //           {/* Filter Buttons */}
+// //           <div className="flex gap-2 mb-4">
+// //             {/* Status Filter */}
+// //             <DropdownMenu>
+// //               <DropdownMenuTrigger asChild>
+// //                 <Button variant="outline">
+// //                   <List className="mr-2 h-4 w-4" />
+// //                   {selectedStatus
+// //                     ? `Status: ${selectedStatus}`
+// //                     : "All statuses"}
+// //                 </Button>
+// //               </DropdownMenuTrigger>
+// //               <DropdownMenuContent>
+// //                 <DropdownMenuItem onClick={() => setSelectedStatus(null)}>
+// //                   All statuses
+// //                 </DropdownMenuItem>
+// //                 {statusOptions.map((status) => (
+// //                   <DropdownMenuItem
+// //                     key={status}
+// //                     onClick={() => setSelectedStatus(status)}
+// //                   >
+// //                     {status}
+// //                   </DropdownMenuItem>
+// //                 ))}
+// //               </DropdownMenuContent>
+// //             </DropdownMenu>
+
+// //             {/* Assignee Filter */}
+// //             <DropdownMenu>
+// //               <DropdownMenuTrigger asChild>
+// //                 <Button variant="outline">
+// //                   <User className="mr-2 h-4 w-4" />
+// //                   {selectedAssignee
+// //                     ? `Assignee: ${members?.find((m) => m._id === selectedAssignee)?.user?.name || "Unknown"}`
+// //                     : "All assignees"}
+// //                 </Button>
+// //               </DropdownMenuTrigger>
+// //               <DropdownMenuContent>
+// //                 <DropdownMenuItem onClick={() => setSelectedAssignee(null)}>
+// //                   All assignees
+// //                 </DropdownMenuItem>
+// //                 {members?.map((member) => (
+// //                   <DropdownMenuItem
+// //                     key={member._id}
+// //                     onClick={() => setSelectedAssignee(member._id)}
+// //                   >
+// //                     {member.user?.name || "Unknown"}
+// //                   </DropdownMenuItem>
+// //                 ))}
+// //               </DropdownMenuContent>
+// //             </DropdownMenu>
+
+// //             {/* Project Switcher */}
+// //             <DropdownMenu>
+// //               <DropdownMenuTrigger asChild>
+// //                 <Button variant="outline">
+// //                   <File className="mr-2 h-4 w-4" />
+// //                   {projectId
+// //                     ? `Project: ${project?.name || "Loading..."}`
+// //                     : "All projects"}
+// //                 </Button>
+// //               </DropdownMenuTrigger>
+// //               <DropdownMenuContent>
+// //                 <DropdownMenuItem
+// //                   onClick={() => router.push(`/?workspaceId=${workspaceId}`)}
+// //                 >
+// //                   All projects
+// //                 </DropdownMenuItem>
+// //                 {projects?.map((proj) => (
+// //                   <DropdownMenuItem
+// //                     key={proj._id}
+// //                     onClick={() =>
+// //                       router.push(
+// //                         `/?workspaceId=${workspaceId}&projectId=${proj._id}`
+// //                       )
+// //                     }
+// //                   >
+// //                     {proj.imageUrl && (
+// //                       <Image
+// //                         src={proj.imageUrl}
+// //                         alt={proj.name}
+// //                         width={16}
+// //                         height={16}
+// //                         className="mr-2 rounded"
+// //                       />
+// //                     )}
+// //                     {proj.name}
+// //                   </DropdownMenuItem>
+// //                 ))}
+// //               </DropdownMenuContent>
+// //             </DropdownMenu>
+
+// //             {/* Due Date Filter */}
+// //             <div className="flex items-center gap-2">
+// //               <Popover>
+// //                 <PopoverTrigger asChild>
+// //                   <Button variant="outline">
+// //                     <Calendar className="mr-2 h-4 w-4" />
+// //                     Due Date
+// //                   </Button>
+// //                 </PopoverTrigger>
+// //                 <PopoverContent className="w-auto p-0">
+// //                   <DatePicker
+// //                     selected={selectedDueDate}
+// //                     onChange={(date: Date | null) => setSelectedDueDate(date)}
+// //                     inline
+// //                   />
+// //                   <div className="p-2">
+// //                     <Button
+// //                       variant="ghost"
+// //                       onClick={() => setSelectedDueDate(null)}
+// //                       className="w-full"
+// //                     >
+// //                       Clear
+// //                     </Button>
+// //                   </div>
+// //                 </PopoverContent>
+// //               </Popover>
+// //             </div>
+// //           </div>
+
+// //           <DottedSeparator className="my-4" />
+
+// //           {/* Table Tab Content */}
+// //           <TabsContent value="table" className="mt-0">
+// //             <table className="w-full border-collapse">
+// //               <thead>
+// //                 <tr className="bg-gray-100">
+// //                   <th className="border p-2 text-left">
+// //                     <input
+// //                       type="checkbox"
+// //                       checked={
+// //                         filteredTasks &&
+// //                         filteredTasks.length > 0 &&
+// //                         selectedTasks.length === filteredTasks.length
+// //                       }
+// //                       onChange={handleSelectAll}
+// //                     />
+// //                   </th>
+// //                   <th className="border p-2 text-left">Task Name</th>
+// //                   <th className="border p-2 text-left">Project</th>
+// //                   <th className="border p-2 text-left">Assignee</th>
+// //                   <th className="border p-2 text-left">Due Date</th>
+// //                   <th className="border p-2 text-left">Status</th>
+// //                   <th className="border p-2 text-left"></th>
+// //                 </tr>
+// //               </thead>
+// //               <tbody>
+// //                 {filteredTasks === undefined ? (
+// //                   <tr>
+// //                     <td colSpan={7} className="p-4 text-center">
+// //                       Loading tasks...
+// //                     </td>
+// //                   </tr>
+// //                 ) : filteredTasks.length === 0 ? (
+// //                   <tr>
+// //                     <td colSpan={7} className="p-4 text-center">
+// //                       No tasks found.
+// //                     </td>
+// //                   </tr>
+// //                 ) : (
+// //                   [...filteredTasks]
+// //                     .sort((a, b) => b._creationTime - a._creationTime)
+// //                     .map((task) => (
+// //                       <tr key={task._id} className="border-b">
+// //                         <td className="p-2">
+// //                           <input
+// //                             type="checkbox"
+// //                             checked={selectedTasks.includes(task._id)}
+// //                             onChange={() => handleSelectTask(task._id)}
+// //                           />
+// //                         </td>
+// //                         <td className="p-2">{task.name}</td>
+// //                         <td className="p-2">
+// //                           <div className="flex items-center gap-2">
+// //                             {task.projectImageUrl && (
+// //                               <Image
+// //                                 src={task.projectImageUrl}
+// //                                 alt={task.projectName}
+// //                                 width={24}
+// //                                 height={24}
+// //                                 className="rounded"
+// //                               />
+// //                             )}
+// //                             <span>{task.projectName}</span>
+// //                           </div>
+// //                         </td>
+// //                         <td className="p-2">
+// //                           {task.assignee ? (
+// //                             <div className="flex items-center gap-2">
+// //                               <Avatar className="size-6">
+// //                                 <AvatarImage src={task.assignee.image} />
+// //                                 <AvatarFallback>
+// //                                   {task.assignee.name?.[0]?.toUpperCase() ||
+// //                                     "?"}
+// //                                 </AvatarFallback>
+// //                               </Avatar>
+// //                               <span>{task.assignee.name}</span>
+// //                             </div>
+// //                           ) : (
+// //                             "Unassigned"
+// //                           )}
+// //                         </td>
+// //                         <td className="p-2">
+// //                           {task.dueDate
+// //                             ? format(new Date(task.dueDate), "MMM d, yyyy")
+// //                             : "No due date"}
+// //                         </td>
+// //                         <td className="p-2">
+// //                           <span
+// //                             className={`px-2 py-1 rounded inline-block ${getStatusClass(task.status)}`}
+// //                           >
+// //                             {task.status}
+// //                           </span>
+// //                         </td>
+// //                         <td className="p-2">
+// //                           <DropdownMenu>
+// //                             <DropdownMenuTrigger asChild>
+// //                               <Button variant="ghost" size="icon">
+// //                                 <MoreVertical className="h-4 w-4" />
+// //                               </Button>
+// //                             </DropdownMenuTrigger>
+// //                             <DropdownMenuContent>
+// //                               <DropdownMenuItem className="font-medium p-[10px]">
+// //                                 <ExternalLink className="size-4 mr-2 stroke-2" />
+// //                                 Task Details
+// //                               </DropdownMenuItem>
+// //                               <DropdownMenuItem className="font-medium p-[10px]">
+// //                                 <ExternalLink className="size-4 mr-2 stroke-2" />
+// //                                 Open Project
+// //                               </DropdownMenuItem>
+// //                               <DropdownMenuItem className="font-medium p-[10px]">
+// //                                 <Pencil className="size-4 mr-2 stroke-2" />
+// //                                 Edit Task
+// //                               </DropdownMenuItem>
+// //                               <DropdownMenuItem
+// //                                 className="text-amber-700 focus:text-amber-700 font-medium p-[10px]"
+// //                                 onClick={() => setConfirmDeleteTaskId(task._id)}
+// //                               >
+// //                                 <Trash className="size-4 mr-2 stroke-2" />
+// //                                 Delete Task
+// //                               </DropdownMenuItem>
+// //                             </DropdownMenuContent>
+// //                           </DropdownMenu>
+// //                         </td>
+// //                       </tr>
+// //                     ))
+// //                 )}
+// //               </tbody>
+// //             </table>
+// //           </TabsContent>
+
+// //           {/* Other Tab Content */}
+// //           <TabsContent value="kanban" className="mt-0">
+// //             Data kanban
+// //           </TabsContent>
+// //           <TabsContent value="calendar" className="mt-0">
+// //             Data calendar
+// //           </TabsContent>
+// //         </div>
+// //       </Tabs>
+
+// //       {/* Task Creation Modal */}
+
+// //       <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
+// //         <DialogContent>
+// //           <DialogTitle>Create New Task</DialogTitle>
+// //           <TaskCreationForm
+// //             workspaceId={workspaceId}
+// //             projectId={projectId}
+// //             onClose={() => setIsTaskModalOpen(false)}
+// //           />
+// //         </DialogContent>
+// //       </Dialog>
+
+// //       {/* Delete Confirmation Dialog */}
+// //       <Dialog open={!!confirmDeleteTaskId} onOpenChange={() => setConfirmDeleteTaskId(null)}>
+// //         <DialogContent>
+// //           <DialogTitle>Delete Task</DialogTitle>
+// //           <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+// //           <div className="flex justify-end gap-2">
+// //             <Button variant="secondary" onClick={() => setConfirmDeleteTaskId(null)}>
+// //               Cancel
+// //             </Button>
+// //             <Button variant="destructive" onClick={handleDeleteTask}>
+// //               Delete
+// //             </Button>
+// //           </div>
+// //         </DialogContent>
+// //       </Dialog>
+// //     </div>
+// //   );
+// // }
+
+
+
+
+
+
+
 // "use client";
 
 // import { useState } from "react";
 // import { useSearchParams, useRouter } from "next/navigation";
-// import { useQuery } from "convex/react";
-// import { useCurrentUser } from "@/features/auth/api/use-current-user";
+// import { useQuery, useMutation } from "convex/react";
 // import { api } from "../../../convex/_generated/api";
 // import { Id } from "../../../convex/_generated/dataModel";
 // import Image from "next/image";
-// import { useDeleteWorkspace } from "@/features/workspaces/api/use-delete-workspace";
-// import { useUpdateWorkspace } from "@/features/workspaces/api/use-update-workspace";
+// import { format } from "date-fns";
 // import {
-//   Dialog,
-//   DialogContent,
-//   DialogTitle,
-//   DialogDescription,
-// } from "@/components/ui/dialog";
-// import { Input } from "@/components/ui/input";
+//   MoreVertical,
+//   PlusIcon,
+//   List,
+//   User,
+//   File,
+//   Calendar,
+//   ExternalLink,
+//   Pencil,
+//   Trash,
+// } from "lucide-react";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Button } from "@/components/ui/button";
-// import { useUpdateProject } from "@/features/projects/api/use-update-project";
-// import { useDeleteProject } from "@/features/projects/api/use-delete-project";
-// import Link from "next/link";
 // import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-// import { PlusIcon } from "lucide-react";
 // import { DottedSeparator } from "@/components/dotted-separator";
 // import TaskCreationForm from "@/components/tasks/TaskCreationForm";
+// import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+// import Link from "next/link";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@/components/ui/popover";
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
+// import { toast } from "sonner";
 
 // export default function Home() {
-//   const { data: user, isLoading } = useCurrentUser();
-//   const isAuthenticated = !!user;
-//   const router = useRouter();
 //   const searchParams = useSearchParams();
+//   const router = useRouter();
 //   const workspaceIdStr = searchParams.get("workspaceId");
 //   const workspaceId = workspaceIdStr
 //     ? (workspaceIdStr as Id<"workspaces">)
@@ -38,351 +587,36 @@
 
 //   const workspace = useQuery(
 //     api.workspaces.getById,
-//     isAuthenticated && workspaceId ? { id: workspaceId } : "skip"
+//     workspaceId ? { id: workspaceId } : "skip"
 //   );
 //   const project = useQuery(
 //     api.projects.getById,
 //     projectId ? { id: projectId } : "skip"
 //   );
-
-//   const deleteWorkspace = useDeleteWorkspace();
-//   const updateWorkspace = useUpdateWorkspace();
-//   const updateProject = useUpdateProject();
-//   const deleteProject = useDeleteProject();
-
-//   const [isEditWorkspaceModalOpen, setIsEditWorkspaceModalOpen] =
-//     useState(false);
-//   const [editWorkspaceName, setEditWorkspaceName] = useState(
-//     workspace?.name || ""
+//   const tasks = useQuery(
+//     projectId ? api.tasks.getByProject : api.tasks.getByWorkspace,
+//     projectId ? { projectId } : workspaceId ? { workspaceId } : "skip"
 //   );
-//   const [confirmDeleteWorkspaceId, setConfirmDeleteWorkspaceId] =
-//     useState<Id<"workspaces"> | null>(null);
-//   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
-//   const [editProjectName, setEditProjectName] = useState(project?.name || "");
-//   const [confirmDeleteProjectId, setConfirmDeleteProjectId] =
-//     useState<Id<"projects"> | null>(null);
-//   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-
-//   const isAdmin = workspace?.isAdmin;
-
-//   const handleEditWorkspace = () => {
-//     if (workspace) {
-//       setEditWorkspaceName(workspace.name);
-//       setIsEditWorkspaceModalOpen(true);
-//     }
-//   };
-
-//   const handleEditWorkspaceSave = async () => {
-//     if (!workspaceId || editWorkspaceName.trim().length < 3) return;
-//     await updateWorkspace({ id: workspaceId, name: editWorkspaceName });
-//     setIsEditWorkspaceModalOpen(false);
-//   };
-
-//   const handleDeleteWorkspace = async () => {
-//     if (!workspaceId) return;
-//     await deleteWorkspace({ id: workspaceId });
-//     setConfirmDeleteWorkspaceId(null);
-//     router.push("/");
-//   };
-
-//   const handleEditProject = () => {
-//     if (project) {
-//       setEditProjectName(project.name);
-//       setIsEditProjectModalOpen(true);
-//     }
-//   };
-
-//   const handleEditProjectSave = async () => {
-//     if (!projectId || editProjectName.trim().length < 3) return;
-//     await updateProject({ id: projectId, name: editProjectName });
-//     setIsEditProjectModalOpen(false);
-//   };
-
-//   const handleDeleteProject = async () => {
-//     if (!projectId) return;
-//     await deleteProject({ id: projectId });
-//     setConfirmDeleteProjectId(null);
-//     router.push(`/?workspaceId=${workspaceId}`);
-//   };
-
-//   if (isLoading) {
-//     return <div className="p-4 text-center">Loading...</div>;
-//   }
-
-//   if (!isAuthenticated) {
-//     return (
-//       <p className="p-4 text-center">Please log in to access this page.</p>
-//     );
-//   }
-
-//   if (projectId && project && workspace) {
-//     return (
-//       <div className="p-4">
-//         {/* Path Display */}
-//         <div className="mb-4 text-sm">
-//           <span className="italic text-gray-500">Workspace: </span>
-//           <Link
-//             href={`/?workspaceId=${workspaceId}`}
-//             className="text-blue-500 hover:underline"
-//           >
-//             {workspace.name}
-//           </Link>
-//           <span> / </span>
-//           <span className="italic text-gray-500">Project: </span>
-//           <span>{project.name}</span>
-//         </div>
-
-//         {/* Project Details Line */}
-//         <div className="flex items-center gap-4">
-//           {project.imageUrl && (
-//             <Image
-//               src={project.imageUrl}
-//               alt={project.name}
-//               width={32}
-//               height={32}
-//               className="rounded"
-//             />
-//           )}
-//           <h2 className="text-lg font-semibold">{project.name}</h2>
-//           <div className="ml-auto flex gap-2">
-//             <Button
-//               size="sm"
-//               className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
-//               onClick={handleEditProject}
-//             >
-//               Edit Project
-//             </Button>
-//             <Button
-//               size="sm"
-//               variant="destructive"
-//               onClick={() => setConfirmDeleteProjectId(project._id)}
-//             >
-//               Delete Project
-//             </Button>
-//           </div>
-//         </div>
-
-//         {/* Project ID */}
-//         <p className="text-xs text-gray-400 mt-4">ID: {project._id}</p>
-
-//         {/* Tab Section */}
-//         <Tabs className="flex-1 w-full border rounded-lg">
-//           <div className="h-full flex flex-col overflow-auto p-4">
-//             <div className="flex flex-col gap-y-2 lg:flex-row justify-between items-center">
-//               <TabsList className="w-full lg:w-auto">
-//                 <TabsTrigger className="h-8 w-full lg:w-auto" value="table">
-//                   Table
-//                 </TabsTrigger>
-//                 <TabsTrigger className="h-8 w-full lg:w-auto" value="kanban">
-//                   Kanban
-//                 </TabsTrigger>
-//                 <TabsTrigger className="h-8 w-full lg:w-auto" value="calendar">
-//                   Calendar
-//                 </TabsTrigger>
-//               </TabsList>
-//               <Button
-//                 onClick={() => setIsTaskModalOpen(true)}
-//                 className="w-full lg:w-auto ml-4"
-//               >
-//                 <PlusIcon className="mr-2 h-4 w-4" /> New
-//               </Button>
-//             </div>
-//             <DottedSeparator className="my-4" />
-//             <div>Data filters</div>
-//             <DottedSeparator className="my-4" />
-//             <>
-//               <TabsContent value="table" className="mt-0">
-//                 Data table
-//               </TabsContent>
-//               <TabsContent value="kanban" className="mt-0">
-//                 Data kanban
-//               </TabsContent>
-//               <TabsContent value="calendar" className="mt-0">
-//                 Data calendar
-//               </TabsContent>
-//             </>
-//           </div>
-//         </Tabs>
-
-//         {/* Task Creation Modal */}
-//         <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
-//           <DialogContent>
-//             <DialogTitle>Create New Task</DialogTitle>
-//             <TaskCreationForm
-//               workspaceId={workspaceId!}
-//               projectId={projectId}
-//               onClose={() => setIsTaskModalOpen(false)}
-//             />
-//           </DialogContent>
-//         </Dialog>
-
-//         {/* Edit Project Modal */}
-//         <Dialog
-//           open={isEditProjectModalOpen}
-//           onOpenChange={setIsEditProjectModalOpen}
-//         >
-//           <DialogContent>
-//             <DialogTitle>Edit Project</DialogTitle>
-//             <DialogDescription>Update the project name.</DialogDescription>
-//             <Input
-//               value={editProjectName}
-//               onChange={(e) => setEditProjectName(e.target.value)}
-//               placeholder="Project name"
-//               minLength={3}
-//             />
-//             <Button
-//               className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
-//               onClick={handleEditProjectSave}
-//             >
-//               Save
-//             </Button>
-//           </DialogContent>
-//         </Dialog>
-
-//         {/* Delete Project Confirmation */}
-//         <Dialog
-//           open={!!confirmDeleteProjectId}
-//           onOpenChange={() => setConfirmDeleteProjectId(null)}
-//         >
-//           <DialogContent>
-//             <DialogTitle>Delete this project?</DialogTitle>
-//             <DialogDescription className="mb-6 text-sm text-gray-600">
-//               This action cannot be undone.
-//             </DialogDescription>
-//             <div className="flex justify-end space-x-2">
-//               <Button
-//                 variant="secondary"
-//                 onClick={() => setConfirmDeleteProjectId(null)}
-//               >
-//                 Cancel
-//               </Button>
-//               <Button variant="destructive" onClick={handleDeleteProject}>
-//                 Delete
-//               </Button>
-//             </div>
-//           </DialogContent>
-//         </Dialog>
-//       </div>
-//     );
-//   } else if (workspaceId && workspace) {
-//     return (
-//       <div className="p-4">
-//         <h2 className="text-lg font-semibold">{workspace.name}</h2>
-//         <p className="text-sm text-gray-500">ID: {workspace._id}</p>
-//         {workspace.imageUrl && (
-//           <Image
-//             src={workspace.imageUrl}
-//             alt={workspace.name}
-//             width={200}
-//             height={200}
-//             className="rounded mt-2"
-//           />
-//         )}
-//         {isAdmin && (
-//           <div className="mt-2 space-x-2">
-//             <Button
-//               className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
-//               onClick={handleEditWorkspace}
-//             >
-//               Edit Workspace
-//             </Button>
-//             <Button
-//               variant="destructive"
-//               onClick={() => setConfirmDeleteWorkspaceId(workspace._id)}
-//             >
-//               Delete Workspace
-//             </Button>
-//           </div>
-//         )}
-
-//         <Dialog
-//           open={isEditWorkspaceModalOpen}
-//           onOpenChange={setIsEditWorkspaceModalOpen}
-//         >
-//           <DialogContent>
-//             <DialogTitle>Edit Workspace</DialogTitle>
-//             <DialogDescription>Update the workspace name.</DialogDescription>
-//             <Input
-//               value={editWorkspaceName}
-//               onChange={(e) => setEditWorkspaceName(e.target.value)}
-//               placeholder="Workspace name"
-//               minLength={3}
-//             />
-//             <Button
-//               className="bg-[#48909b] hover:bg-[#3d7f87] text-white"
-//               onClick={handleEditWorkspaceSave}
-//             >
-//               Save
-//             </Button>
-//           </DialogContent>
-//         </Dialog>
-
-//         <Dialog
-//           open={!!confirmDeleteWorkspaceId}
-//           onOpenChange={() => setConfirmDeleteWorkspaceId(null)}
-//         >
-//           <DialogContent>
-//             <DialogTitle>Delete this workspace?</DialogTitle>
-//             <DialogDescription className="mb-6 text-sm text-gray-600">
-//               This action cannot be undone.
-//             </DialogDescription>
-//             <div className="flex justify-end space-x-2">
-//               <Button
-//                 variant="secondary"
-//                 onClick={() => setConfirmDeleteWorkspaceId(null)}
-//               >
-//                 Cancel
-//               </Button>
-//               <Button variant="destructive" onClick={handleDeleteWorkspace}>
-//                 Delete
-//               </Button>
-//             </div>
-//           </DialogContent>
-//         </Dialog>
-//       </div>
-//     );
-//   } else {
-//     return (
-//       <div className="p-4">
-//         <p>
-//           No workspace selected. Please choose a workspace from the sidebar.
-//         </p>
-//       </div>
-//     );
-//   }
-// }
-
-// update tasks for New response
-// "use client";
-
-// import { useState } from "react";
-// import { useSearchParams } from "next/navigation";
-// import { useQuery } from "convex/react";
-// import { api } from "../../../convex/_generated/api";
-// import { Id } from "../../../convex/_generated/dataModel";
-// import Image from "next/image";
-// import { format } from "date-fns";
-// import { MoreVerticalIcon, PlusIcon } from "lucide-react";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Button } from "@/components/ui/button";
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-// import { DottedSeparator } from "@/components/dotted-separator";
-// import TaskCreationForm from "@/components/tasks/TaskCreationForm";
-// import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-// import Link from "next/link";
-
-// export default function Home() {
-//   const searchParams = useSearchParams();
-//   const workspaceIdStr = searchParams.get("workspaceId");
-//   const workspaceId = workspaceIdStr ? (workspaceIdStr as Id<"workspaces">) : null;
-//   const projectId = searchParams.get("projectId") as Id<"projects"> | null;
-
-//   const workspace = useQuery(api.workspaces.getById, workspaceId ? { id: workspaceId } : "skip");
-//   const project = useQuery(api.projects.getById, projectId ? { id: projectId } : "skip");
-//   const tasks = useQuery(api.tasks.getByProject, projectId ? { projectId } : "skip");
+//   const members = useQuery(
+//     api.workspaces.getMembers,
+//     workspaceId ? { workspaceId } : "skip"
+//   );
+//   const projects = useQuery(
+//     api.projects.get,
+//     workspaceId ? { workspaceId } : "skip"
+//   );
 
 //   const [selectedTasks, setSelectedTasks] = useState<Id<"tasks">[]>([]);
 //   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+//   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+//   const [selectedAssignee, setSelectedAssignee] =
+//     useState<Id<"members"> | null>(null);
+//   const [selectedDueDate, setSelectedDueDate] = useState<Date | null>(null);
+//   const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState<Id<"tasks"> | null>(null);
+
+//   const deleteTask = useMutation(api.tasks.remove);
+
+//   const statusOptions = ["Backlog", "In Progress", "In Review", "Todo", "Done"];
 
 //   const handleSelectAll = () => {
 //     if (tasks && selectedTasks.length === tasks.length) {
@@ -394,11 +628,54 @@
 
 //   const handleSelectTask = (taskId: Id<"tasks">) => {
 //     setSelectedTasks((prev) =>
-//       prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
+//       prev.includes(taskId)
+//         ? prev.filter((id) => id !== taskId)
+//         : [...prev, taskId]
 //     );
 //   };
 
-//   // No workspace selected
+//   const handleDeleteTask = async () => {
+//     if (!confirmDeleteTaskId) return;
+//     try {
+//       await deleteTask({ id: confirmDeleteTaskId });
+//       toast.success("Task deleted successfully");
+//     } catch {
+//       toast.error("Failed to delete task");
+//     } finally {
+//       setConfirmDeleteTaskId(null);
+//     }
+//   };
+
+//   const filteredTasks = tasks?.filter((task) => {
+//     if (selectedStatus && task.status !== selectedStatus) return false;
+//     if (selectedAssignee && task.assigneeId !== selectedAssignee) return false;
+//     if (
+//       selectedDueDate &&
+//       (!task.dueDate ||
+//         new Date(task.dueDate).toDateString() !==
+//           selectedDueDate.toDateString())
+//     )
+//       return false;
+//     return true;
+//   });
+
+//   const getStatusClass = (status: string) => {
+//     const styles: Record<string, string> = {
+//       Todo: "border-transparent bg-red-400 text-primary hover:bg-red-400/80 rounded-full",
+//       "In Progress":
+//         "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80 rounded-full",
+//       "In Review":
+//         "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80 rounded-full",
+//       Done: "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80 rounded-full",
+//       Backlog:
+//         "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80 rounded-full",
+//     };
+//     return (
+//       styles[status] ||
+//       "border-transparent bg-gray-400 text-primary hover:bg-gray-400/80 rounded-full"
+//     );
+//   };
+
 //   if (!workspaceId) {
 //     return (
 //       <div className="p-4">
@@ -407,7 +684,6 @@
 //     );
 //   }
 
-//   // Workspace loading
 //   if (workspace === undefined) {
 //     return (
 //       <div className="p-4">
@@ -416,7 +692,6 @@
 //     );
 //   }
 
-//   // Workspace not found or no access
 //   if (workspace === null) {
 //     return (
 //       <div className="p-4">
@@ -425,67 +700,54 @@
 //     );
 //   }
 
-//   // Workspace selected, but no project
-//   if (!projectId) {
-//     return (
-//       <div className="p-4">
-//         <h2 className="text-lg font-semibold">{workspace.name}</h2>
-//         {workspace.imageUrl && (
-//           <Image
-//             src={workspace.imageUrl}
-//             alt={workspace.name}
-//             width={200}
-//             height={200}
-//             className="rounded mt-2"
-//           />
-//         )}
-//       </div>
-//     );
-//   }
-
-//   // Project loading
-//   if (project === undefined) {
-//     return (
-//       <div className="p-4">
-//         <p>Loading project...</p>
-//       </div>
-//     );
-//   }
-
-//   // Project not found or no access
-//   if (project === null) {
-//     return (
-//       <div className="p-4">
-//         <p>Project not found or you do not have access.</p>
-//       </div>
-//     );
-//   }
-
-//   // Both workspace and project selected
 //   return (
 //     <div className="p-4">
 //       {/* Path Display */}
 //       <div className="mb-4 text-sm">
 //         <span className="italic text-gray-500">Workspace: </span>
-//         <Link href={`/?workspaceId=${workspaceId}`} className="text-blue-500 hover:underline">
+//         <Link
+//           href={`/?workspaceId=${workspaceId}`}
+//           className="text-blue-500 hover:underline"
+//         >
 //           {workspace.name}
 //         </Link>
-//         <span> / </span>
-//         <span className="italic text-gray-500">Project: </span>
-//         <span>{project.name}</span>
+//         {projectId && project && (
+//           <>
+//             <span> / </span>
+//             <span className="italic text-gray-500">Project: </span>
+//             <span>{project.name}</span>
+//           </>
+//         )}
 //       </div>
 
 //       {/* Project Details */}
-//       <div className="flex items-center gap-4">
-//         {project.imageUrl && (
-//           <Image src={project.imageUrl} alt={project.name} width={32} height={32} className="rounded" />
-//         )}
-//         <h2 className="text-lg font-semibold">{project.name}</h2>
-//       </div>
-//       <p className="text-xs text-gray-400 mt-4">ID: {project._id}</p>
+//       {projectId && project ? (
+//         <div className="flex items-center gap-4">
+//           {project.imageUrl && (
+//             <Image
+//               src={project.imageUrl}
+//               alt={project.name}
+//               width={32}
+//               height={32}
+//               className="rounded"
+//             />
+//           )}
+//           <h2 className="text-lg font-semibold">{project.name}</h2>
+//         </div>
+//       ) : (
+//         <h2 className="text-lg font-semibold">
+//           All projects in {workspace.name}
+//         </h2>
+//       )}
+//       {projectId && project && (
+//         <p className="text-xs text-gray-400 mt-4">ID: {project._id}</p>
+//       )}
 
 //       {/* Tabs */}
-//       <Tabs defaultValue="table" className="flex-1 w-full border rounded-lg mt-4">
+//       <Tabs
+//         defaultValue="table"
+//         className="flex-1 w-full border rounded-lg mt-4"
+//       >
 //         <div className="h-full flex flex-col overflow-auto p-4">
 //           <div className="flex flex-col gap-y-2 lg:flex-row justify-between items-center">
 //             <TabsList className="w-full lg:w-auto">
@@ -499,12 +761,136 @@
 //                 Calendar
 //               </TabsTrigger>
 //             </TabsList>
-//             <Button onClick={() => setIsTaskModalOpen(true)} className="w-full lg:w-auto ml-4">
+//             <Button
+//               onClick={() => setIsTaskModalOpen(true)}
+//               className="w-full lg:w-auto ml-4"
+//             >
 //               <PlusIcon className="mr-2 h-4 w-4" /> New
 //             </Button>
 //           </div>
 //           <DottedSeparator className="my-4" />
-//           <div>Data filters</div>
+
+//           {/* Filter Buttons */}
+//           <div className="flex gap-2 mb-4">
+//             {/* Status Filter */}
+//             <DropdownMenu>
+//               <DropdownMenuTrigger asChild>
+//                 <Button variant="outline">
+//                   <List className="mr-2 h-4 w-4" />
+//                   {selectedStatus
+//                     ? `Status: ${selectedStatus}`
+//                     : "All statuses"}
+//                 </Button>
+//               </DropdownMenuTrigger>
+//               <DropdownMenuContent>
+//                 <DropdownMenuItem onClick={() => setSelectedStatus(null)}>
+//                   All statuses
+//                 </DropdownMenuItem>
+//                 {statusOptions.map((status) => (
+//                   <DropdownMenuItem
+//                     key={status}
+//                     onClick={() => setSelectedStatus(status)}
+//                   >
+//                     {status}
+//                   </DropdownMenuItem>
+//                 ))}
+//               </DropdownMenuContent>
+//             </DropdownMenu>
+
+//             {/* Assignee Filter */}
+//             <DropdownMenu>
+//               <DropdownMenuTrigger asChild>
+//                 <Button variant="outline">
+//                   <User className="mr-2 h-4 w-4" />
+//                   {selectedAssignee
+//                     ? `Assignee: ${members?.find((m) => m._id === selectedAssignee)?.user?.name || "Unknown"}`
+//                     : "All assignees"}
+//                 </Button>
+//               </DropdownMenuTrigger>
+//               <DropdownMenuContent>
+//                 <DropdownMenuItem onClick={() => setSelectedAssignee(null)}>
+//                   All assignees
+//                 </DropdownMenuItem>
+//                 {members?.map((member) => (
+//                   <DropdownMenuItem
+//                     key={member._id}
+//                     onClick={() => setSelectedAssignee(member._id)}
+//                   >
+//                     {member.user?.name || "Unknown"}
+//                   </DropdownMenuItem>
+//                 ))}
+//               </DropdownMenuContent>
+//             </DropdownMenu>
+
+//             {/* Project Switcher */}
+//             <DropdownMenu>
+//               <DropdownMenuTrigger asChild>
+//                 <Button variant="outline">
+//                   <File className="mr-2 h-4 w-4" />
+//                   {projectId
+//                     ? `Project: ${project?.name || "Loading..."}`
+//                     : "All projects"}
+//                 </Button>
+//               </DropdownMenuTrigger>
+//               <DropdownMenuContent>
+//                 <DropdownMenuItem
+//                   onClick={() => router.push(`/?workspaceId=${workspaceId}`)}
+//                 >
+//                   All projects
+//                 </DropdownMenuItem>
+//                 {projects?.map((proj) => (
+//                   <DropdownMenuItem
+//                     key={proj._id}
+//                     onClick={() =>
+//                       router.push(
+//                         `/?workspaceId=${workspaceId}&projectId=${proj._id}`
+//                       )
+//                     }
+//                   >
+//                     {proj.imageUrl && (
+//                       <Image
+//                         src={proj.imageUrl}
+//                         alt={proj.name}
+//                         width={16}
+//                         height={16}
+//                         className="mr-2 rounded"
+//                       />
+//                     )}
+//                     {proj.name}
+//                   </DropdownMenuItem>
+//                 ))}
+//               </DropdownMenuContent>
+//             </DropdownMenu>
+
+//             {/* Due Date Filter */}
+//             <div className="flex items-center gap-2">
+//               <Popover>
+//                 <PopoverTrigger asChild>
+//                   <Button variant="outline">
+//                     <Calendar className="mr-2 h-4 w-4" />
+//                     Due Date
+//                   </Button>
+//                 </PopoverTrigger>
+//                 <PopoverContent className="w-auto p-0">
+//                   <DatePicker
+//                     selected={selectedDueDate}
+//                     onChange={(date: Date | null) => setSelectedDueDate(date)}
+//                     inline
+//                   />
+//                   <div className="p-2">
+//                     <Button
+//                       variant="ghost"
+//                       onClick={() => setSelectedDueDate(null)}
+//                       className="w-full"
+//                     >
+//                       Clear
+//                     </Button>
+//                   </div>
+//                 </PopoverContent>
+//               </Popover>
+//             </div>
+//           </div>
+
 //           <DottedSeparator className="my-4" />
 
 //           {/* Table Tab Content */}
@@ -515,7 +901,11 @@
 //                   <th className="border p-2 text-left">
 //                     <input
 //                       type="checkbox"
-//                       checked={tasks && tasks.length > 0 && selectedTasks.length === tasks.length}
+//                       checked={
+//                         filteredTasks &&
+//                         filteredTasks.length > 0 &&
+//                         selectedTasks.length === filteredTasks.length
+//                       }
 //                       onChange={handleSelectAll}
 //                     />
 //                   </th>
@@ -528,20 +918,20 @@
 //                 </tr>
 //               </thead>
 //               <tbody>
-//                 {tasks === undefined ? (
+//                 {filteredTasks === undefined ? (
 //                   <tr>
 //                     <td colSpan={7} className="p-4 text-center">
 //                       Loading tasks...
 //                     </td>
 //                   </tr>
-//                 ) : tasks.length === 0 ? (
+//                 ) : filteredTasks.length === 0 ? (
 //                   <tr>
 //                     <td colSpan={7} className="p-4 text-center">
 //                       No tasks found.
 //                     </td>
 //                   </tr>
 //                 ) : (
-//                   [...tasks]
+//                   [...filteredTasks]
 //                     .sort((a, b) => b._creationTime - a._creationTime)
 //                     .map((task) => (
 //                       <tr key={task._id} className="border-b">
@@ -555,16 +945,16 @@
 //                         <td className="p-2">{task.name}</td>
 //                         <td className="p-2">
 //                           <div className="flex items-center gap-2">
-//                             {project.imageUrl && (
+//                             {task.projectImageUrl && (
 //                               <Image
-//                                 src={project.imageUrl}
-//                                 alt={project.name}
+//                                 src={task.projectImageUrl}
+//                                 alt={task.projectName}
 //                                 width={24}
 //                                 height={24}
 //                                 className="rounded"
 //                               />
 //                             )}
-//                             <span>{project.name}</span>
+//                             <span>{task.projectName}</span>
 //                           </div>
 //                         </td>
 //                         <td className="p-2">
@@ -573,7 +963,8 @@
 //                               <Avatar className="size-6">
 //                                 <AvatarImage src={task.assignee.image} />
 //                                 <AvatarFallback>
-//                                   {task.assignee.name?.[0]?.toUpperCase() || "?"}
+//                                   {task.assignee.name?.[0]?.toUpperCase() ||
+//                                     "?"}
 //                                 </AvatarFallback>
 //                               </Avatar>
 //                               <span>{task.assignee.name}</span>
@@ -583,11 +974,46 @@
 //                           )}
 //                         </td>
 //                         <td className="p-2">
-//                           {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "No due date"}
+//                           {task.dueDate
+//                             ? format(new Date(task.dueDate), "MMM d, yyyy")
+//                             : "No due date"}
 //                         </td>
-//                         <td className="p-2">{task.status}</td>
 //                         <td className="p-2">
-//                           <MoreVerticalIcon className="h-4 w-4" />
+//                           <span
+//                             className={`px-2 py-1 rounded inline-block ${getStatusClass(task.status)}`}
+//                           >
+//                             {task.status}
+//                           </span>
+//                         </td>
+//                         <td className="p-2">
+//                           <DropdownMenu>
+//                             <DropdownMenuTrigger asChild>
+//                               <Button variant="ghost" size="icon">
+//                                 <MoreVertical className="h-4 w-4" />
+//                               </Button>
+//                             </DropdownMenuTrigger>
+//                             <DropdownMenuContent>
+//                               <DropdownMenuItem className="font-medium p-[10px]">
+//                                 <ExternalLink className="size-4 mr-2 stroke-2" />
+//                                 Task Details
+//                               </DropdownMenuItem>
+//                               <DropdownMenuItem className="font-medium p-[10px]">
+//                                 <ExternalLink className="size-4 mr-2 stroke-2" />
+//                                 Open Project
+//                               </DropdownMenuItem>
+//                               <DropdownMenuItem className="font-medium p-[10px]">
+//                                 <Pencil className="size-4 mr-2 stroke-2" />
+//                                 Edit Task
+//                               </DropdownMenuItem>
+//                               <DropdownMenuItem
+//                                 className="text-amber-700 focus:text-amber-700 font-medium p-[10px]"
+//                                 onClick={() => setConfirmDeleteTaskId(task._id)}
+//                               >
+//                                 <Trash className="size-4 mr-2 stroke-2" />
+//                                 Delete Task
+//                               </DropdownMenuItem>
+//                             </DropdownMenuContent>
+//                           </DropdownMenu>
 //                         </td>
 //                       </tr>
 //                     ))
@@ -607,6 +1033,7 @@
 //       </Tabs>
 
 //       {/* Task Creation Modal */}
+
 //       <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
 //         <DialogContent>
 //           <DialogTitle>Create New Task</DialogTitle>
@@ -617,27 +1044,48 @@
 //           />
 //         </DialogContent>
 //       </Dialog>
+
+//       {/* Delete Confirmation Dialog */}
+//       <Dialog open={!!confirmDeleteTaskId} onOpenChange={() => setConfirmDeleteTaskId(null)}>
+//         <DialogContent>
+//           <DialogTitle>Delete Task</DialogTitle>
+//           <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+//           <div className="flex justify-end gap-2">
+//             <Button variant="secondary" onClick={() => setConfirmDeleteTaskId(null)}>
+//               Cancel
+//             </Button>
+//             <Button variant="destructive" onClick={handleDeleteTask}>
+//               Delete
+//             </Button>
+//           </div>
+//         </DialogContent>
+//       </Dialog>
 //     </div>
 //   );
 // }
 
-// for adding filters in the task table
+
+
+
 "use client";
 
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
 import Image from "next/image";
 import { format } from "date-fns";
 import {
-  MoreVerticalIcon,
+  MoreVertical,
   PlusIcon,
   List,
   User,
   File,
   Calendar,
+  ExternalLink,
+  Pencil,
+  Trash,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -659,6 +1107,7 @@ import {
 } from "@/components/ui/popover";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "sonner";
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -679,7 +1128,7 @@ export default function Home() {
   );
   const tasks = useQuery(
     projectId ? api.tasks.getByProject : api.tasks.getByWorkspace,
-    projectId ? { projectId } : (workspaceId ? { workspaceId } : "skip")
+    projectId ? { projectId } : workspaceId ? { workspaceId } : "skip"
   );
   const members = useQuery(
     api.workspaces.getMembers,
@@ -696,6 +1145,9 @@ export default function Home() {
   const [selectedAssignee, setSelectedAssignee] =
     useState<Id<"members"> | null>(null);
   const [selectedDueDate, setSelectedDueDate] = useState<Date | null>(null);
+  const [confirmDeleteTaskId, setConfirmDeleteTaskId] = useState<Id<"tasks"> | null>(null);
+
+  const deleteTask = useMutation(api.tasks.remove);
 
   const statusOptions = ["Backlog", "In Progress", "In Review", "Todo", "Done"];
 
@@ -715,6 +1167,18 @@ export default function Home() {
     );
   };
 
+  const handleDeleteTask = async () => {
+    if (!confirmDeleteTaskId) return;
+    try {
+      await deleteTask({ id: confirmDeleteTaskId });
+      toast.success("Task deleted successfully");
+    } catch {
+      toast.error("Failed to delete task");
+    } finally {
+      setConfirmDeleteTaskId(null);
+    }
+  };
+
   const filteredTasks = tasks?.filter((task) => {
     if (selectedStatus && task.status !== selectedStatus) return false;
     if (selectedAssignee && task.assigneeId !== selectedAssignee) return false;
@@ -730,13 +1194,19 @@ export default function Home() {
 
   const getStatusClass = (status: string) => {
     const styles: Record<string, string> = {
-      "Todo": "border-transparent bg-red-400 text-primary hover:bg-red-400/80 rounded-full",
-      "In Progress": "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80 rounded-full",
-      "In Review": "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80 rounded-full",
-      "Done": "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80 rounded-full",
-      "Backlog": "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80 rounded-full",
+      Todo: "border-transparent bg-red-400 text-primary hover:bg-red-400/80 rounded-full",
+      "In Progress":
+        "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80 rounded-full",
+      "In Review":
+        "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80 rounded-full",
+      Done: "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80 rounded-full",
+      Backlog:
+        "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80 rounded-full",
     };
-    return styles[status] || "border-transparent bg-gray-400 text-primary hover:bg-gray-400/80 rounded-full";
+    return (
+      styles[status] ||
+      "border-transparent bg-gray-400 text-primary hover:bg-gray-400/80 rounded-full"
+    );
   };
 
   if (!workspaceId) {
@@ -798,7 +1268,9 @@ export default function Home() {
           <h2 className="text-lg font-semibold">{project.name}</h2>
         </div>
       ) : (
-        <h2 className="text-lg font-semibold">All projects in {workspace.name}</h2>
+        <h2 className="text-lg font-semibold">
+          All projects in {workspace.name}
+        </h2>
       )}
       {projectId && project && (
         <p className="text-xs text-gray-400 mt-4">ID: {project._id}</p>
@@ -888,18 +1360,24 @@ export default function Home() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
                   <File className="mr-2 h-4 w-4" />
-                  {projectId ? `Project: ${project?.name || "Loading..."}` : "All projects"}
+                  {projectId
+                    ? `Project: ${project?.name || "Loading..."}`
+                    : "All projects"}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => router.push(`/?workspaceId=${workspaceId}`)}>
+                <DropdownMenuItem
+                  onClick={() => router.push(`/?workspaceId=${workspaceId}`)}
+                >
                   All projects
                 </DropdownMenuItem>
                 {projects?.map((proj) => (
                   <DropdownMenuItem
                     key={proj._id}
                     onClick={() =>
-                      router.push(`/?workspaceId=${workspaceId}&projectId=${proj._id}`)
+                      router.push(
+                        `/?workspaceId=${workspaceId}&projectId=${proj._id}`
+                      )
                     }
                   >
                     {proj.imageUrl && (
@@ -943,9 +1421,6 @@ export default function Home() {
                   </div>
                 </PopoverContent>
               </Popover>
-              {selectedDueDate && (
-                <span>{format(selectedDueDate, "MMM d, yyyy")}</span>
-              )}
             </div>
           </div>
 
@@ -1037,12 +1512,41 @@ export default function Home() {
                             : "No due date"}
                         </td>
                         <td className="p-2">
-                          <span className={`px-2 py-1 rounded inline-block ${getStatusClass(task.status)}`}>
+                          <span
+                            className={`px-2 py-1 rounded inline-block ${getStatusClass(task.status)}`}
+                          >
                             {task.status}
                           </span>
                         </td>
                         <td className="p-2">
-                          <MoreVerticalIcon className="h-4 w-4" />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem className="font-medium p-[10px]">
+                                <ExternalLink className="size-4 mr-2 stroke-2" />
+                                Task Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="font-medium p-[10px]">
+                                <ExternalLink className="size-4 mr-2 stroke-2" />
+                                Open Project
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="font-medium p-[10px]">
+                                <Pencil className="size-4 mr-2 stroke-2" />
+                                Edit Task
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-amber-700 focus:text-amber-700 font-medium p-[10px]"
+                                onClick={() => setConfirmDeleteTaskId(task._id)}
+                              >
+                                <Trash className="size-4 mr-2 stroke-2" />
+                                Delete Task
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))
@@ -1070,6 +1574,22 @@ export default function Home() {
             projectId={projectId}
             onClose={() => setIsTaskModalOpen(false)}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!confirmDeleteTaskId} onOpenChange={() => setConfirmDeleteTaskId(null)}>
+        <DialogContent>
+          <DialogTitle>Delete Task</DialogTitle>
+          <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setConfirmDeleteTaskId(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteTask}>
+              Delete
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
