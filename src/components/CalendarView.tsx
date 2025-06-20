@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Image from "next/image";
 
 // Define the shape of calendar events
 interface CalendarEvent {
@@ -63,6 +64,39 @@ const CustomToolbar = ({
   );
 };
 
+// Custom Event Component to display task name, member's image, and project's image
+const CustomEvent = ({ event }: { event: CalendarEvent }) => {
+  const { title, resource } = event;
+  const { assignee, projectImageUrl } = resource;
+
+  return (
+    <div className="flex flex-col items-start">
+      <span className="text-sm font-medium">{title}</span>
+      <div className="flex items-center mt-1">
+        {assignee?.image && (
+          <Image
+            src={assignee.image}
+            alt={assignee.name || "Assignee"}
+            width={16}
+            height={16}
+            className="rounded-full"
+          />
+        )}
+        <span className="mx-1 text-gray-500">•</span>
+        {projectImageUrl && (
+          <Image
+            src={projectImageUrl}
+            alt={resource.projectName || "Project"}
+            width={16}
+            height={16}
+            className="rounded"
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const CalendarView = ({ tasks }: CalendarViewProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -80,38 +114,40 @@ const CalendarView = ({ tasks }: CalendarViewProps) => {
       resource: task,
     }));
 
-  // Style events based on task status
+  // Style events with status-based left border color and uniform other borders
   const eventStyleGetter = (event: CalendarEvent) => {
     const status = event.resource.status;
-    let borderColor;
+    let statusColor;
 
     switch (status) {
       case "Backlog":
-        borderColor = "#d4d4d8"; // Gray
+        statusColor = "#d4d4d8"; // Gray
         break;
       case "Todo":
-        borderColor = "#f87171"; // Red
+        statusColor = "#f87171"; // Red
         break;
       case "In Progress":
-        borderColor = "#fcd34d"; // Yellow
+        statusColor = "#fcd34d"; // Yellow
         break;
       case "In Review":
-        borderColor = "#60a5fa"; // Blue
+        statusColor = "#60a5fa"; // Blue
         break;
       case "Done":
-        borderColor = "#34d399"; // Green
+        statusColor = "#34d399"; // Green
         break;
       default:
-        borderColor = "#e5e7eb"; // Default gray
+        statusColor = "#e5e7eb"; // Default gray
     }
 
     return {
       style: {
-        borderColor,
-        borderWidth: "2px",
-        borderStyle: "solid",
+        borderLeft: `4px solid ${statusColor}`, // Status color for left border
+        borderTop: "1px solid #e5e7eb", // Uniform gray for other borders
+        borderRight: "1px solid #e5e7eb",
+        borderBottom: "1px solid #e5e7eb",
         backgroundColor: "transparent",
         color: "#000",
+        padding: "2px 4px", // Padding to space content from borders
       },
     };
   };
@@ -130,6 +166,7 @@ const CalendarView = ({ tasks }: CalendarViewProps) => {
         views={["month"]}
         components={{
           toolbar: CustomToolbar,
+          event: CustomEvent, // Use the custom event component
         }}
       />
     </div>
