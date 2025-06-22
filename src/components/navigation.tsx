@@ -27,7 +27,7 @@ export const Navigation = () => {
     {
       label: "My Tasks",
       path: "/tasks",
-      href: "/tasks",
+      href: workspaceId ? `/tasks?workspaceId=${workspaceId}` : "/tasks",
       icon: GoCheckCircle,
       activeIcon: GoCheckCircleFill,
     },
