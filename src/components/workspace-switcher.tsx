@@ -1,5 +1,3 @@
-// shat lavn a GROK-ov
-
 "use client";
 
 import { useState } from "react";
