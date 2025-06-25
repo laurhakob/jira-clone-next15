@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: [
       "whimsical-kiwi-376.convex.cloud",
-      "https://doting-fennec-95.convex.cloud",
+      "doting-fennec-95.convex.cloud",
       "lh3.googleusercontent.com",
       "avatars.githubusercontent.com",
     ],
